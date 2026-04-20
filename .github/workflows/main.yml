@@ -29,7 +29,12 @@ jobs:
         extensions: mbstring, dom, curl, libxml, mysql
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      working-directory: ./backend/app
+
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      working-directory: ./backend/app
+      
     - name: Run Tests
       run: php artisan test
+      working-directory: ./backend/app
