@@ -51,12 +51,12 @@
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -64,6 +64,7 @@
 
 body {
   margin: 0;
+  background-color: #f8fafc;
 }
 
 h1,
@@ -108,4 +109,18 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 2s linear infinite;
 }

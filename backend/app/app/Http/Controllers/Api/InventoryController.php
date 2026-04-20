@@ -10,6 +10,6 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        return response()->json(Inventory::all());
+        return response()->json(Inventory::with('vendor')->get());
     }
 }
