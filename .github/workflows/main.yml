@@ -34,7 +34,11 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       working-directory: ./backend/app
-      
+
+    - name: Generate App Key
+      run: php artisan key:generate
+      working-directory: ./backend/app
+
     - name: Run Tests
       run: php artisan test
       working-directory: ./backend/app
