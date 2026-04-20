@@ -183,7 +183,6 @@
   }
 }
 
-/* App.css */
 .dashboard-container {
   padding: 40px;
   width: 100%;
@@ -272,4 +271,63 @@
 .status-critical {
   background: #fef2f2;
   color: #ef4444;
+}
+.alerts-section {
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.critical-alert-card {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-left: 6px solid #e11d48;
+  padding: 16px 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9f1239;
+  font-weight: 600;
+}
+
+.pulse-icon {
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
