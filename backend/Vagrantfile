@@ -1,0 +1,71 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    # Using the same box as your other projects for consistency
+    config.vm.box = "generic/rocky9"
+    config.vm.box_version = "4.3.2"
+
+    # Resources: Increased for Rocky 9 stability
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = 2
+      vb.name = "pulse-logistics-backend"
+    end
+
+    # Sync the backend folder
+    config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+    # Networking: Using .18 to avoid your .10 and .11 projects
+    config.vm.network "private_network", ip: "192.168.10.18", virtualbox__intnet: "vagrant-intnet"
+    
+    # Port Forwarding: Using 88 series to avoid 80, 81, 83, 85, and 3000
+    config.vm.network "forwarded_port", guest: 80, host: 8088
+    config.vm.network "forwarded_port", guest: 3306, host: 33068
+    config.vm.network "forwarded_port", guest: 22, host: 2208, auto_config: false, id: "ssh"
+    config.vm.network "forwarded_port", guest: 5173, host: 8100 # For Vite if needed inside VM
+
+    # Provisioning
+    config.vm.provision "shell", inline: <<-SHELL
+        # Security & System Setup
+        sed -i -e 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+        service sshd restart
+        setenforce 0
+        systemctl stop firewalld
+        systemctl disable firewalld
+        timedatectl set-timezone Asia/Tokyo
+
+        # Repositories & PHP 8.2
+        dnf install -y epel-release
+        dnf install -y http://rpms.remirepo.net/enterprise/remi-release-9.rpm
+        dnf install -y dnf-utils
+        dnf module reset php -y
+        dnf module install -y php:remi-8.2
+        dnf install -y php php-mbstring php-pdo php-xml php-bcmath php-intl php-pecl-zip php-mysqlnd php-gd httpd
+
+        # Node.js 20 (For backend build tools)
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+        dnf install -y nodejs
+
+        # Composer
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+
+        # MySQL & Redis
+        dnf install -y mysql-server redis
+        systemctl enable --now mysqld redis
+        
+        # Initialize MySQL root without password
+        mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY ''; FLUSH PRIVILEGES;"
+
+        # Apache Config
+        systemctl enable --now httpd
+        
+        echo "192.168.10.18 pulse-api.test" | sudo tee -a /etc/hosts
+    SHELL
+
+    # Non-privileged setup (Composer/Laravel)
+    config.vm.provision "shell", privileged: false, inline: <<-SHELL
+        cd /vagrant
+        # If this is a new project, we would run 'composer create-project laravel/laravel app'
+    SHELL
+end
